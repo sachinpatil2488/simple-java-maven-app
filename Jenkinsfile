@@ -5,13 +5,9 @@ node('master') {
     stage('clean') {
 	sh 'mvn clean'
     }
-    stage('compile') {
+    stage('build') {
 	sh 'mvn compile'
-    }
-    stage('test') {
 	sh 'mvn test'
-    }
-    stage('package') {
 	sh 'mvn package'
     }
 }
