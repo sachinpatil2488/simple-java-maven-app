@@ -1,13 +1,57 @@
-node('slave-1') {
-    stage('checkout') {
-    	checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/sachinpatil2488/simple-java-maven-app.git']]])
+pipeline {
+  agent any
+  
+  stages {
+    stage('Build and Test') {
+      parallel {
+
+        stage('Compile On Slave 1') {
+          agent {
+            node {
+              label 'slave-1'
+            }
+          }
+          steps {
+            sh "mvn clean"
+          }
+        }
+        stage('build On Slave 1') {
+          agent {
+            node {
+              label 'slave-1'
+            }
+          }
+          steps {
+            	sh 'mvn compile'
+				sh 'mvn test'
+				sh 'mvn package'
+          }
+        }
+        stage('Compile On Slave 2') {
+          agent {
+            node {
+              label 'slave-2'
+            }
+          }
+          steps {
+            sh "mvn clean"
+          }
+        }
+        stage('build On Slave 2') {
+          agent {
+            node {
+              label 'slave-2'
+            }
+          }
+          steps {
+            	sh 'mvn compile'
+				sh 'mvn test'
+				sh 'mvn package'
+          }
+        }
+
+      }
     }
-    stage('clean') {
-	sh 'mvn clean'
-    }
-    stage('build') {
-	sh 'mvn compile'
-	sh 'mvn test'
-	sh 'mvn package'
-    }
+
+  }
 }
